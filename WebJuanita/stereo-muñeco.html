@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>stereo-muñeco</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="../css/style.css">
+	</head>
+
+	<body>
+		<!--Header-->
+		<header class="regreso">
+			<!--Nombre-->
+			<div class="container-fluid">
+				<div class="col-xs-4 col-md-4">
+					<h2>Juanita Ochoa</h2>
+				</div>
+				<div class="col-xs-4 col-md-4 pull-left">
+					<a href="../index.html" class="btn inicio">Inicio</a>
+				</div>
+				<div class="col-xs-4 col-md-4">
+					<img src="../imagenes/avatar.png" class="img-responsive ima pull-right" alt="me">
+				</div>
+			</div>
+		</header>
+
+		<br>
+		<div class="container">
+			<div class="titulo">
+				<h3>- Persona y Estereo -</h3>
+			</div>
+		</div>
+		<br>
+		<br>
+		<script type="module">
+
+			import * as THREE from './js/three.module.js';
+
+			import { StereoEffect } from './js/StereoEffect.js';
+			import { DDSLoader } from './js/DDSLoader.js';
+			import { MTLLoader } from './js/MTLLoader.js';
+			import { OBJLoader } from './js/OBJLoader.js';
+
+			var container, camera, scene, renderer, effect;
+
+			var spheres = [];
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.z = 3200;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.CubeTextureLoader()
+					.setPath( 'texturas/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
+
+
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'texturas/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+				textureCube.mapping = THREE.CubeRefractionMapping;
+
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
+
+				for ( var i = 0; i < 500; i ++ ) {
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = Math.random() * 10000 - 5000;
+					mesh.position.y = Math.random() * 10000 - 5000;
+					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+					scene.add( mesh );
+
+					spheres.push( mesh );
+
+				}
+
+				// model
+
+				var onProgress = function ( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 10;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				};
+
+				var onError = function () { };
+
+				var manager = new THREE.LoadingManager();
+				manager.addHandler( /\.dds$/i, new DDSLoader() );
+
+				// comment in the following line and import TGALoader if your asset uses TGA textures
+				// manager.addHandler( /\.tga$/i, new TGALoader() );
+
+				new MTLLoader( manager )
+					.setPath( 'modelos/')
+					.load( 'male02.mtl', function ( materials ) {
+
+						materials.preload();
+
+						new OBJLoader( manager )
+							.setMaterials( materials )
+							.setPath( 'modelos/' )
+							.load( 'male02.obj', function ( object ) {
+
+								object.scale.set(15,15,15);
+								scene.add( object );
+								object.position.set(0,-2100,0);
+
+							}, onProgress, onError );
+				});
+				
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				container.appendChild( renderer.domElement );
+
+				effect = new StereoEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var timer = 0.0001 * Date.now();
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
+
+				
+				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+
+					var sphere = spheres[ i ];
+
+					sphere.position.x = 5000 * Math.cos( timer + i );
+					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );
+
+				}
+
+				effect.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
