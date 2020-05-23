@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css?family=Alfa+Slab+One|Anton|Cute+Font|Dancing+Script|Heebo|Kalam|Merriweather|PT+Sans+Narrow|Pacifico|Special+Elite|Tangerine&display=swap');
+
+.header{
+    background: #112626;
+    color: #F2F2F2;
+    padding: 70px;
+}
+
+.regreso{
+    background: #112626;
+    color: #F2F2F2;
+    padding: 5px;
+}
+
+.ima{
+    width: 70px;
+    height: 70px;
+}
+
+.inicio{
+    background: #112626;
+    color: #F2F2F2;
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+.titulo{
+    background: #0D0D0D;
+    color: #F2F2F2;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.ej{
+    background: #1C403C;
+    color:#F2F2F2;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.ej2{
+    background: #F2F2F2;
+    border-color:#112626;
+    color:#0D0D0D;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.boton{
+    background: #F2F2F2;
+    color: #737373;
+    padding-left: 90px;
+    padding-right: 90px;
+}
+
+.boton2{
+    background: #1C403C;
+    color: #F2F2F2;
+    padding-left: 90px;
+    padding-right: 90px;
+}
+
+.imagen{
+    margin-top: 41px;
+}
+
+.imagen2{
+    margin-top: 63px;
+}
+
+footer{
+    background: #112626;
+    color: #F2F2F2;
+    padding: 25px;
+}
+
+.der{
+    text-align: right;
+}
+.cen{
+    text-align: center;
+    color:#F2F2F2;
+}
